@@ -1,0 +1,46 @@
+﻿@page "/noteadd"
+
+@using Domain.DTOs
+@using MonitorDataAccess.DataAccess
+@using NotesModule.Entities
+@using NotesModule.Services
+
+<PageTitle>Add note</PageTitle>
+
+<h1>Add note</h1>
+
+<p>Enter a note for today:</p>
+
+<div class="form-group">
+    <label for="moodInput">Text:</label>
+    <input type="text" class="form-control" id="moodInput" @bind="@text" />
+</div>
+
+<button type="submit" class="btn btn-primary" @onclick="AddMoodEntry">Submit</button>
+
+@code {
+    private string text;
+
+    [Inject]
+    private NavigationManager _navigation { get; set; } = default!;
+
+    [Inject]
+    private NotesDataAccessService _dataAccess { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    private async Task AddMoodEntry()
+    {
+        LogEntry newEntry = new()
+        {
+            Creation = DateOnly.FromDateTime(DateTime.Now),
+            Text = text
+        };
+
+        await _dataAccess.Add(newEntry);
+
+        _navigation.NavigateTo("notelist");
+    }
+}

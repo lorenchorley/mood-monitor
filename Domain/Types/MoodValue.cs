@@ -1,0 +1,11 @@
+﻿namespace Domain.Types;
+
+public enum MoodValue
+{
+    Worst = 0,
+    VeryBad = 1,
+    Bad = 2,
+    Good = 3,
+    VeryGood = 4,
+    Best = 5
+}

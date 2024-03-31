@@ -1,0 +1,244 @@
+﻿@using BlazorBootstrap
+@using Domain.DTOs
+@using MonitorDataAccess.DataAccess
+@using MoodModule.Entities
+@using MoodModule.Services
+
+<h3>Mood history</h3>
+
+<MatSlider @bind-Value="@Val"></MatSlider>
+
+@* <LineChart @ref="lineChart" Width="800" Class="mb-4" /> *@
+@* <BarChart @ref="barChart" Width="800" Class="mb-4" /> *@
+
+@* <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="Size.Small" @onclick="async () => await Refresh()"> Refresh </Button> *@
+
+<ApexChart TItem="StatsEntry"
+           Title="Scatter Sample"
+           XAxisType="XAxisType.Datetime"
+           Width="800">
+
+    <ApexPointSeries TItem="StatsEntry"
+                     Items="selectedEntries"
+                     Name="Mood"
+                     SeriesType="SeriesType.Scatter"
+                     XValue="@(e => e.Creation.ToUnixTimeMilliseconds())"
+                     YValue="@(e => (int)e.Mood)"
+                     Stroke="@(new SeriesStroke{ Width=1 })"
+                     OrderBy="e=>e.X" />
+
+    <ApexPointSeries TItem="StatsEntry"
+                     Items="selectedEntries"
+                     SeriesType="SeriesType.Scatter"
+                     Name="Energy level"
+                     XValue="@(e => e.Creation.ToUnixTimeMilliseconds())"
+                     Stroke="@(new SeriesStroke{ Width=1 })"
+                     YValue="@(e => (int)e.EnergyLevel)"
+                     OrderBy="e=>e.X" />
+
+    <ApexPointSeries TItem="StatsEntry"
+                     Items="selectedEntries"
+                     SeriesType="SeriesType.Scatter"
+                     Name="Depression"
+                     XValue="@(e => e.Creation.ToUnixTimeMilliseconds())"
+                     Stroke="@(new SeriesStroke{ Width=1 })"
+                     YValue="@(e => (int)e.DepressionRating)"
+                     OrderBy="e=>e.X" />
+</ApexChart>
+
+@code {
+
+    // https://demos.blazorbootstrap.com/
+
+    // https://blazor.radzen.com/datepicker
+
+    // https://antblazor.com/en-US/charts/heatmap
+    // https://antblazor.com/en-US/charts/calendarchart
+    // https://antblazor.com/en-US/charts/bubble
+    // https://antblazor.com/en-US/charts/radar
+    // https://antblazor.com/en-US/charts/scatter
+
+    // https://apexcharts.github.io/Blazor-ApexCharts/
+
+    // https://www.matblazor.com/
+
+    public decimal Val
+    {
+        get => _val;
+        set
+        {
+            _val = value;
+            this.StateHasChanged();
+        }
+    }
+
+    private decimal _val = 0;
+
+    // https://www.fluentui-blazor.net/
+
+    // https://blazorstrap.io/V5/V5
+
+    [Parameter]
+    public DateOnly StartDate { get; set; }
+
+    [Parameter]
+    public DateOnly EndDate { get; set; }
+
+    private BarChart barChart = default!;
+    private BarChartOptions options = default!;
+
+    private LineChart lineChart = default!;
+    private LineChartOptions lineChartOptions = default!;
+    private ChartData chartData = default!;
+
+    private class DailyMoodEntry
+    {
+        public DateOnly Date { get; set; }
+
+        public double? Mood { get; set; }
+        public double? MoodMin { get; set; }
+        public double? MoodMax { get; set; }
+
+        public double? EnergyLevel { get; set; }
+        public double? EnergyLevelMin { get; set; }
+        public double? EnergyLevelMax { get; set; }
+
+        public double? DepressionRating { get; set; }
+        public double? DepressionRatingMin { get; set; }
+        public double? DepressionRatingMax { get; set; }
+    }
+
+    private List<StatsEntry>? allEntries;
+    private List<StatsEntry>? entriesByDay;
+    private List<StatsEntry>? selectedEntries;
+
+    [Inject]
+    private MoodDataAccessService _moodDataAccessService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        allEntries = await _moodDataAccessService.GetAll();
+
+        selectedEntries =
+            allEntries.Where(e => DateOnly.FromDateTime(e.Creation) > StartDate)
+                      .Where(e => DateOnly.FromDateTime(e.Creation) < EndDate)
+                      .ToList();
+
+        chartData = new ChartData { Labels = GetDefaultDataLabels(), Datasets = GetDataSets() };
+
+        // lineChartOptions = new() { Responsive = true, Interaction = new Interaction { Mode = InteractionMode.Index } };
+
+        options = new BarChartOptions();
+        options.Interaction.Mode = InteractionMode.Index;
+        options.Responsive = true;
+
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // if (firstRender)
+        // {
+        //     // await lineChart.InitializeAsync(chartData, lineChartOptions);
+        //     await barChart.InitializeAsync(chartData, options);
+        // }
+        // await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private List<IChartDataset> GetDataSets()
+    {
+        var datasets = new List<IChartDataset>();
+
+        // Mood history
+        datasets.Add(GetMoodHistoryLineChartDataset());
+        datasets.Add(GetMoodHistoryBarChartDataset());
+
+        return datasets;
+    }
+
+    private LineChartDataset GetMoodHistoryLineChartDataset()
+    {
+        var c = ColorBuilder.CategoricalTwelveColors[0].ToColor();
+
+        return new LineChartDataset
+            {
+                Label = $"Mood",
+                Data = GetMoodHistoryData(),
+                BackgroundColor = new List<string> { c.ToRgbString() },
+                BorderColor = new List<string> { c.ToRgbString() },
+                BorderWidth = new List<double> { 2 },
+                HoverBorderWidth = new List<double> { 4 },
+                PointBackgroundColor = new List<string> { c.ToRgbString() },
+                PointRadius = new List<int> { 0 }, // hide points
+                PointHoverRadius = new List<int> { 4 }
+            };
+    }
+    
+    private BarChartDataset GetMoodHistoryBarChartDataset()
+    {
+        var c = ColorBuilder.CategoricalTwelveColors[0].ToColor();
+
+        return new BarChartDataset
+            {
+                Label = $"Mood",
+                Data = GetMoodHistoryData(),
+                BackgroundColor = new List<string> { c.ToRgbString() },
+                BorderColor = new List<string> { c.ToRgbString() },
+                BorderWidth = new List<double> { 2 },
+                HoverBorderWidth = new List<double> { 4 },
+                // PointBackgroundColor = new List<string> { c.ToRgbString() },
+                // PointRadius = new List<int> { 0 }, // hide points
+                // PointHoverRadius = new List<int> { 4 }
+            };
+    }
+
+    private List<double> GetMoodHistoryData()
+    {
+        var numberOfDays = (int)(EndDate.ToDateTime(TimeOnly.MinValue) - StartDate.ToDateTime(TimeOnly.MinValue)).TotalDays + 1;
+
+        var data = new List<double>();
+
+        for (var offset = 0; offset < numberOfDays; offset++)
+        {
+            DateTime startOfDay = StartDate.AddDays(offset).ToDateTime(TimeOnly.MinValue);
+            DateTime startOfNextDay = StartDate.AddDays(offset + 1).ToDateTime(TimeOnly.MinValue);
+
+            var matches = 
+                selectedEntries.Where(e => e.Creation > startOfDay)
+                               .Where(e => e.Creation < startOfNextDay)
+                               .Select(e => (double)e.Mood)
+                               .ToList();
+
+            if (matches.Count == 0)
+            {
+                data.Add(0);
+            }
+            else
+            {
+                double sum = matches.Sum();
+                double average = sum / (double)matches.Count;
+
+                data.Add(average);
+            }
+        }
+
+        return data;
+    }
+
+    private List<string> GetDefaultDataLabels()
+    {
+        // The number of days between the start and end date
+        var numberOfDays = (int)(EndDate.ToDateTime(TimeOnly.MinValue) - StartDate.ToDateTime(TimeOnly.MinValue)).TotalDays + 1;
+
+        var labels = new List<string>();
+
+        for (var offset = 0; offset < numberOfDays; offset++)
+        {
+            DateOnly date = StartDate.AddDays(offset);
+            labels.Add(date.ToString());
+        }
+
+        return labels;
+    }
+
+}

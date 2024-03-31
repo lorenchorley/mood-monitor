@@ -1,0 +1,55 @@
+﻿@page "/notelist"
+
+@using Domain.DTOs
+@using MonitorDataAccess.DataAccess
+@using NotesModule.Entities
+@using NotesModule.Services
+
+<PageTitle>Log history</PageTitle>
+
+<h1>Log history</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (entries == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Text</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in entries.OrderByDescending(e => e.Creation))
+            {
+                <tr>
+                    <td>@entry.Creation</td>
+                    <td>@ToHtml(entry.Text)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<LogEntry>? entries;
+
+    [Inject]
+    private NotesDataAccessService _notesDataAccessService { get; set; } = default!;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        entries = await _notesDataAccessService.GetAll();
+    }
+
+    private MarkupString ToHtml(string rawText)
+    {
+        return new MarkupString(rawText.Replace("\n", "<br />"));
+    }
+}

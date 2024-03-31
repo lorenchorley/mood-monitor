@@ -1,0 +1,270 @@
+﻿@page "/moodadd"
+@using Domain.DTOs
+@using MonitorDataAccess.DataAccess
+@using MoodModule.Entities
+@using MoodModule.Services
+@using Domain.Types
+@using MoodModule.Tools
+
+
+<PageTitle>Add Mood Entry</PageTitle>
+
+<h1>Add Mood Entry</h1>
+
+<p>Enter your mood for today:</p>
+
+<div class="form-group">
+    <label for="moodInput">Mood:</label>
+    @* <input type="number" class="form-control" id="moodInput" @bind="@mood" /> *@
+    <div class="rz-p-12 rz-text-align-center">
+        <RadzenSelectBar @bind-Value=@moodSelectValues TValue="IEnumerable<int>" Multiple="true">
+            <Items>
+                @foreach (var v in Enum.GetValues<MoodValue>())
+                {
+                    var classString = $"{nameof(MoodValue)}.{v}";
+                    var profile = visualProfileMood[v];
+                    <RadzenSelectBarItem Text="@profile.Title" Value="@((int)v+1)" />
+                }
+            </Items>
+        </RadzenSelectBar>
+    </div>
+
+    <label for="energyLevelInput">Energy level:</label>
+    @* <input type="number" class="form-control" id="energyLevelInput" @bind="@energy" /> *@
+    <div class="rz-p-12 rz-text-align-center">
+        <RadzenSelectBar @bind-Value=@energySelectValues TValue="IEnumerable<int>" Multiple="true">
+            <Items>
+                @foreach (var v in Enum.GetValues<EnergyValue>())
+                {
+                    var classString = $"{nameof(EnergyValue)}.{v}";
+                    var profile = visualProfileEnergy[v];
+                    <RadzenSelectBarItem Text="@profile.Title" Value="@((int)v+1)" />
+                }
+            </Items>
+        </RadzenSelectBar>
+    </div>
+
+    <label for="moodInput">Depression index:</label>
+    @* <input type="number" class="form-control" id="depressionRatingInput" @bind="@depression" /> *@
+        <div class="rz-p-12 rz-text-align-center">
+        <RadzenSelectBar @bind-Value=@depressionSelectValues TValue="IEnumerable<int>" Multiple="true">
+            <Items>
+                @foreach (var v in Enum.GetValues<DepressionValue>())
+                {
+                    var classString = $"{nameof(DepressionValue)}.{v}";
+                    var profile = visualProfileDepression[v];
+                    <RadzenSelectBarItem Text="@profile.Title" Value="@((int)v+1)" />
+                }
+            </Items>
+        </RadzenSelectBar>
+    </div>
+
+</div>
+
+<button type="submit" class="btn btn-primary" @onclick="AddMoodEntry">Submit</button>
+
+@code {
+
+
+    public class FormButtonProfile
+    {
+        public string Title { get; set; }
+        public string HexColour { get; set; }
+    }
+
+    Dictionary<MoodValue, FormButtonProfile> visualProfileMood = new()
+    {
+        {
+            MoodValue.Worst,
+            new FormButtonProfile()
+            {
+                Title = "1",
+                HexColour = "#982123"
+            }
+        },
+        {
+            MoodValue.VeryBad,
+            new FormButtonProfile()
+            {
+                Title = "2",
+                HexColour = "#D03F2E"
+            }
+        },
+        {
+            MoodValue.Bad,
+            new FormButtonProfile()
+            {
+                Title = "3",
+                HexColour = "#F1C359"
+            }
+        },
+        {
+            MoodValue.Good,
+            new FormButtonProfile()
+            {
+                Title = "4",
+                HexColour = "#94C280"
+            }
+        },
+        {
+            MoodValue.VeryGood,
+            new FormButtonProfile()
+            {
+                Title = "5",
+                HexColour = "#0C9CB4"
+            }
+        },
+        {
+            MoodValue.Best,
+            new FormButtonProfile()
+            {
+                Title = "6",
+                HexColour = "#025189"
+            }
+        },
+    };
+
+    Dictionary<EnergyValue, FormButtonProfile> visualProfileEnergy = new()
+    {
+        {
+            EnergyValue.Worst,
+            new FormButtonProfile()
+            {
+                Title = "1",
+                HexColour = "#9EF6CE"
+            }
+        },
+        {
+            EnergyValue.VeryBad,
+            new FormButtonProfile()
+            {
+                Title = "2",
+                HexColour = "#58C2AE"
+            }
+        },
+        {
+            EnergyValue.Bad,
+            new FormButtonProfile()
+            {
+                Title = "3",
+                HexColour = "#3EA9A3"
+            }
+        },
+        {
+            EnergyValue.Good,
+            new FormButtonProfile()
+            {
+                Title = "4",
+                HexColour = "#28848F"
+            }
+        },
+        {
+            EnergyValue.VeryGood,
+            new FormButtonProfile()
+            {
+                Title = "5",
+                HexColour = "#175F75"
+            }
+        },
+        {
+            EnergyValue.Best,
+            new FormButtonProfile()
+            {
+                Title = "6",
+                HexColour = "#0A3D5C"
+            }
+        },
+    };
+
+    Dictionary<DepressionValue, FormButtonProfile> visualProfileDepression = new()
+    {
+        {
+            DepressionValue.None,
+            new FormButtonProfile()
+            {
+                Title = "No impact",
+            }
+        },
+        {
+            DepressionValue.SlightInfluence,
+            new FormButtonProfile()
+            {
+                Title = "Slight impact",
+            }
+        },
+        {
+            DepressionValue.HeavyInfluence,
+            new FormButtonProfile()
+            {
+                Title = "Heavy impact",
+            }
+        },
+    };
+    
+    private SelectListState _moodState = new();
+
+    private IEnumerable<int> moodSelectValues
+    {
+        get
+        {
+            return _moodState.Get();
+        }
+        set
+        {
+            _moodState.Set(value);
+        }
+    }
+    
+    private SelectListState _energyState = new();
+
+    private IEnumerable<int> energySelectValues
+    {
+        get
+        {
+            return _energyState.Get();
+        }
+        set
+        {
+            _energyState.Set(value);
+        }
+    }
+    
+    private SelectListState _depressionState = new();
+
+    private IEnumerable<int> depressionSelectValues
+    {
+        get
+        {
+            return _depressionState.Get();
+        }
+        set
+        {
+            _depressionState.Set(value);
+        }
+    }
+
+    [Inject]
+    private NavigationManager _navigation { get; set; }
+
+    [Inject]
+    private MoodDataAccessService _moodDataAccessService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    private async Task AddMoodEntry()
+    {
+        StatsEntry newEntry = new()
+            {
+                Creation = DateTime.Now,
+                Mood = (MoodValue) _moodState.GetUniqueValueOrDefault(),
+                EnergyLevel = (EnergyValue) _energyState.GetUniqueValueOrDefault(),
+                DepressionRating = (DepressionValue) _depressionState.GetUniqueValueOrDefault()
+            };
+
+        await _moodDataAccessService.Add(newEntry);
+
+        _navigation.NavigateTo("moodlist");
+    }
+}

@@ -1,0 +1,19 @@
+﻿@page "/stats"
+
+<div class="mb-3">
+    <DateInput TValue="DateOnly" @bind-Value="@startDate" Placeholder="Start" class="w-25" />
+    <DateInput TValue="DateOnly" @bind-Value="@endDate" Placeholder="End" class="w-25" />
+</div>
+
+<MoodHistory @key="GetMoodHistoryKey()"  StartDate="@startDate" EndDate="@endDate" />
+
+
+@code {
+
+    private DateOnly startDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(-4));
+    private DateOnly endDate = DateOnly.FromDateTime(DateTime.Now);
+    private string GetMoodHistoryKey()
+    {
+        return $"{startDate}-{endDate}";
+    }
+}

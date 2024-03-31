@@ -1,0 +1,14 @@
+﻿@using MoodMonitor.Shared;
+
+<Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="new[] { typeof(MonitorDataAccess.Extensions.ServiceExtensions).Assembly, typeof(MoodModule.Extensions.ServiceExtensions).Assembly, typeof(StatsModule.Extensions.ServiceExtensions).Assembly, typeof(NotesModule.Extensions.ServiceExtensions).Assembly }">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(NavLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(NavLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>

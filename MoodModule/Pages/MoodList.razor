@@ -1,0 +1,54 @@
+﻿@page "/moodlist"
+
+@using Domain.DTOs
+@using MonitorDataAccess.DataAccess
+@using MoodModule.Entities
+@using MoodModule.Services
+
+<PageTitle>Mood history</PageTitle>
+
+<h1>Mood history</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (entries == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Mood</th>
+                <th>Energy Level</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in entries)
+            {
+                <tr>
+                    <td>@entry.Creation.ToLocalTime()</td>
+                    <td>@entry.Mood</td>
+                    <td>@entry.EnergyLevel</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<StatsEntry>? entries;
+
+    [Inject]
+    private MoodDataAccessService _moodDataAccessService { get; set; } = default!;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // _mapper = new MapperConfiguration(cfg => cfg.AddProfile<MoodMappingProfile>()).CreateMapper();
+
+        entries = await _moodDataAccessService.GetAll();
+    }
+}
