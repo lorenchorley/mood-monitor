@@ -18,7 +18,7 @@ namespace MonitorDataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Creation = table.Column<DateOnly>(type: "date", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Annotation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EncryptedText = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>

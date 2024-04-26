@@ -17,18 +17,22 @@ namespace MonitorDataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.3")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("MonitorDataAccess.DTOs.LogEntry", b =>
+            modelBuilder.Entity("Domain.DTOs.LogEntry", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Annotation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateOnly>("Creation")
                         .HasColumnType("date");
@@ -37,16 +41,12 @@ namespace MonitorDataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Logs");
                 });
 
-            modelBuilder.Entity("MonitorDataAccess.DTOs.StatsEntry", b =>
+            modelBuilder.Entity("Domain.DTOs.StatsEntry", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
