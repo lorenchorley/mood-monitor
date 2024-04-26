@@ -6,6 +6,9 @@ using StatsModule.Extensions;
 using NotesModule.Extensions;
 using MoodModule.Entities;
 using MatBlazor;
+using Microsoft.Extensions.Hosting;
+using System;
+using MonitorDataAccess.EF;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,7 +65,9 @@ app.UseRouting();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
-   //.AddAdditionalAssemblies(typeof(DataAccess.Extensions.MoodServiceExtensions).Assembly)
+//.AddAdditionalAssemblies(typeof(DataAccess.Extensions.MoodServiceExtensions).Assembly)
    .AddInteractiveServerRenderMode();
+
+app.Services.EnsureDatabaseCreated();
 
 app.Run();

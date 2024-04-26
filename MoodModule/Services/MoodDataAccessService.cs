@@ -29,7 +29,7 @@ public partial class MoodDataAccessService
 
     public async Task<StatsEntry> Add(StatsEntry statsEntry)
     {
-        return await _fileDataAccess.Add(statsEntry);
+        return await _dbStatsDataAccess.Add(statsEntry);
     }
 
 }

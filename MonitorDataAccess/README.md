@@ -42,6 +42,18 @@ Update-Database 0
 ```
 
 
+Reinitialise the database
+---
+
+You can combine two updates to reinitialise the database. The first deletes everything and the second reinitialises with the lastest migration.
+
+```
+Update-Database 0
+Update-Database
+```
+
+
+
 See also
 ---
 

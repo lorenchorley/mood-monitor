@@ -11,7 +11,6 @@ public static class ServiceExtensions
 {
     public static void AddDataAccessServices(this IServiceCollection services)
     {
-
         services.AddSingleton<FileMoodDataAccess>();
         services.AddSingleton<ImportFromMoodHistoryDataAccess>();
         services.AddSingleton<FileLogDataAccess>();
@@ -20,14 +19,14 @@ public static class ServiceExtensions
         services.AddSingleton<ImportFromGoogleNotesDataAccess>();
 
         string dataDirectory = @"C:\Users\lchorley\source\repos\mood-monitor\DataManagement\Data\";
-        string[] googleNotesFiles = new string[]
-        {
+        string[] googleNotesFiles =
+        [
             "GoogleNotes 21.10.31.txt",
             "GoogleNotes 22.10.31.txt",
             "GoogleNotes 23.07.26.txt",
             "GoogleNotes 23.11.05.txt",
             "GoogleNotes 24.03.17.txt",
-        };
+        ];
 
         foreach (var file in googleNotesFiles)
         {
@@ -48,10 +47,13 @@ public static class ServiceExtensions
 
         services.Configure<LocalFileData>(configuration.GetSection(LocalFileData.ConfigurationSection));
 
-        //using (PubContext context = new())
-        //{
-        //    context.Database.EnsureCreated();
-        //}
+    }
 
+    public static void EnsureDatabaseCreated(this IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+
+        var context = scope.ServiceProvider.GetService<PubContext>();
+        context.Database.EnsureCreated();
     }
 }

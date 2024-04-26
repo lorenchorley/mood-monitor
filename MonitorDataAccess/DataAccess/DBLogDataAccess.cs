@@ -11,6 +11,9 @@ public partial class DBLogDataAccess : IDataAccess<LogEntry>
 
     public async Task<LogEntry> Add(LogEntry entry)
     {
+        // Transformer le texte en clair en chriffé
+        entry.UpdateEncryptedText();
+
         var addedEntity = await _appDbContext.Logs.AddAsync(entry);
         _appDbContext.SaveChanges();
         return addedEntity.Entity;
@@ -18,7 +21,7 @@ public partial class DBLogDataAccess : IDataAccess<LogEntry>
 
     public async Task<List<LogEntry>> GetAll()
     {
-        return await _appDbContext.Logs.ToListAsync();
+        return await _appDbContext.Logs.Select(e => e.UpdateDecryptedText()).ToListAsync();
     }
 
 }

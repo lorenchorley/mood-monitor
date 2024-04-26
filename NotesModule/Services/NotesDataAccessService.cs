@@ -10,11 +10,11 @@ public partial class NotesDataAccessService
 {
     private readonly FileLogDataAccess _fileDataAccess;
     private readonly ImportFromGoogleNotesDataAccess _fileImportDataAccess;
-    private readonly DBLogDataAccess _dbDataAccess;
+    private readonly DBLogDataAccess _dbLogDataAccess;
 
     public async Task<List<LogEntry>> GetAll()
     {
-        var dbList = await _dbDataAccess.GetAll();
+        var dbList = await _dbLogDataAccess.GetAll();
         return dbList;
 
         var fileList = await _fileDataAccess.GetAll();
@@ -30,6 +30,6 @@ public partial class NotesDataAccessService
 
     public async Task<LogEntry> Add(LogEntry logEntry)
     {
-        return await _dbDataAccess.Add(logEntry);
+        return await _dbLogDataAccess.Add(logEntry);
     }
 }
