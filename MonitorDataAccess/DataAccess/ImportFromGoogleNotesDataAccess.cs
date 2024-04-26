@@ -10,7 +10,7 @@ namespace MonitorDataAccess.DataAccess;
 
 public partial class ImportFromGoogleNotesDataAccess([FromKeyedServices("GoogleNotesData")] IEnumerable<ITextDataSource> dataSources) : IDataAccess<LogHistoryEntry>
 {
-    private Regex _logHeaderMatch = new Regex(@"(?<Date>\d{1,2}\/\d{1,2}\/\d{1,4})[^\n]*");
+    private Regex _logHeaderMatch = new Regex(@"(?<Annotation>[a-zA-Z]\w*)?\s*(?<Date>\d{1,2}\/\d{1,2}\/\d{1,4})[^\n]*");
 
     public Task Add(LogHistoryEntry entry)
     {
@@ -48,6 +48,11 @@ public partial class ImportFromGoogleNotesDataAccess([FromKeyedServices("GoogleN
                 }
 
                 entry = StartNewEntry(line, match);
+
+                if (match.Groups.TryGetValue("Annotation", out Group? annotation))
+                {
+                    entry.Annotation = annotation.Value;
+                }
             }
             else if (entry != null)
             {

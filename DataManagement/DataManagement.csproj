@@ -8,7 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Moodistory 20240129 132739.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Moodistory 20240129 132739.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\MonitorDataAccess\MonitorDataAccess.csproj" />
   </ItemGroup>
 
 

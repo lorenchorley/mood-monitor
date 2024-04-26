@@ -28,6 +28,7 @@ public static class LogMappingProfile
         return new LogEntry
         {
             Creation = legacyEntry.Date,
+            Annotation = legacyEntry.Annotation,
             Text = legacyEntry.NoteText
         };
     }

@@ -1,6 +1,14 @@
 ﻿@using MoodMonitor.Shared;
 
-<Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="new[] { typeof(MonitorDataAccess.Extensions.ServiceExtensions).Assembly, typeof(MoodModule.Extensions.ServiceExtensions).Assembly, typeof(StatsModule.Extensions.ServiceExtensions).Assembly, typeof(NotesModule.Extensions.ServiceExtensions).Assembly }">
+<Router 
+    AppAssembly="@typeof(App).Assembly" 
+    AdditionalAssemblies="new[] { 
+        typeof(MonitorDataAccess.Extensions.ServiceExtensions).Assembly, 
+        typeof(MoodModule.Extensions.ServiceExtensions).Assembly, 
+        typeof(StatsModule.Extensions.ServiceExtensions).Assembly, 
+        typeof(NotesModule.Extensions.ServiceExtensions).Assembly, 
+        typeof(DataManagement.Extensions.ServiceExtensions).Assembly 
+    }">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(NavLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />

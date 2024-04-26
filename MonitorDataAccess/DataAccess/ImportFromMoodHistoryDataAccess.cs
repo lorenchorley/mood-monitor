@@ -7,7 +7,7 @@ namespace MonitorDataAccess.DataAccess;
 //[AutoConstructor]
 public partial class ImportFromMoodHistoryDataAccess : IDataAccess<MoodHistoryEntry>
 {
-    private readonly string _filePath = @"C:\Users\lchorley\source\repos\MoodMonitor\MonitorDataAccess\ExampleData\Moodistory 20240129 132739.json";
+    private readonly string _filePath = @"C:\Users\lchorley\source\repos\mood-monitor\MonitorDataAccess\ExampleData\Moodistory 20240129 132739.json";
 
     public Task Add(MoodHistoryEntry entry)
     {

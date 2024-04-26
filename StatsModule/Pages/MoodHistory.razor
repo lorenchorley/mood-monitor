@@ -23,7 +23,7 @@
                      Name="Mood"
                      SeriesType="SeriesType.Scatter"
                      XValue="@(e => e.Creation.ToUnixTimeMilliseconds())"
-                     YValue="@(e => (int)e.Mood)"
+                     YValue="@(e => (int?)e.Mood)"
                      Stroke="@(new SeriesStroke{ Width=1 })"
                      OrderBy="e=>e.X" />
 
@@ -33,7 +33,7 @@
                      Name="Energy level"
                      XValue="@(e => e.Creation.ToUnixTimeMilliseconds())"
                      Stroke="@(new SeriesStroke{ Width=1 })"
-                     YValue="@(e => (int)e.EnergyLevel)"
+                     YValue="@(e => (int?)e.EnergyLevel)"
                      OrderBy="e=>e.X" />
 
     <ApexPointSeries TItem="StatsEntry"
@@ -42,7 +42,7 @@
                      Name="Depression"
                      XValue="@(e => e.Creation.ToUnixTimeMilliseconds())"
                      Stroke="@(new SeriesStroke{ Width=1 })"
-                     YValue="@(e => (int)e.DepressionRating)"
+                     YValue="@(e => (int?)e.DepressionRating)"
                      OrderBy="e=>e.X" />
 </ApexChart>
 

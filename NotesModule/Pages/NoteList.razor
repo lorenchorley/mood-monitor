@@ -28,7 +28,13 @@ else
             @foreach (var entry in entries.OrderByDescending(e => e.Creation))
             {
                 <tr>
-                    <td>@entry.Creation</td>
+                    <td>
+                        <p>@entry.Creation</p>
+                        @if (!string.IsNullOrEmpty(entry.Annotation))
+                        {
+                            <MatFAB Label="@entry.Annotation"></MatFAB>
+                        }
+                    </td>
                     <td>@ToHtml(entry.Text)</td>
                 </tr>
             }
