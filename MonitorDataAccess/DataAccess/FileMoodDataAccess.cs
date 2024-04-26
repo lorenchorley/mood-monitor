@@ -18,13 +18,15 @@ public class FileMoodDataAccess : IDataAccess<StatsEntry>
         _logger = logger;
     }
 
-    public async Task Add(StatsEntry entry)
+    public async Task<StatsEntry> Add(StatsEntry entry)
     {
         var fullPath = Path.GetFullPath(localFileData.Value.MoodData);
         var moodEntries = await GetAll();
         moodEntries.Add(entry);
         var json = JsonConvert.SerializeObject(moodEntries);
         await File.WriteAllTextAsync(fullPath, json);
+
+        return entry;
     }
 
     public async Task<List<StatsEntry>> GetAll()

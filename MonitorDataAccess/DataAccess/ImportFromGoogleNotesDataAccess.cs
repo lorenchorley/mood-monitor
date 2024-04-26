@@ -12,7 +12,7 @@ public partial class ImportFromGoogleNotesDataAccess([FromKeyedServices("GoogleN
 {
     private Regex _logHeaderMatch = new Regex(@"(?<Annotation>[a-zA-Z]\w*)?\s*(?<Date>\d{1,2}\/\d{1,2}\/\d{1,4})[^\n]*");
 
-    public Task Add(LogHistoryEntry entry)
+    public Task<LogHistoryEntry> Add(LogHistoryEntry entry)
     {
         throw new NotImplementedException();
     }

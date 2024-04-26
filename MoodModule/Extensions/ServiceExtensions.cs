@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MonitorDataAccess.DataAccess;
 using MoodModule.Entities;
 using MoodModule.Services;
 
@@ -9,7 +10,8 @@ public static class ServiceExtensions
 {
     public static void AddMoodServices(this IServiceCollection services)
     {
-        services.AddSingleton<MoodDataAccessService>();
+        services.AddScoped<MoodDataAccessService>();
+        services.AddScoped<DBStatsDataAccess>();
     }
 
     public static void ConfigureMoodServices(this IServiceCollection services, IConfiguration configuration)

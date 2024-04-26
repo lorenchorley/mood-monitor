@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Domain.DTOs;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MonitorDataAccess.Config;
-using Domain.DTOs;
 using Newtonsoft.Json;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -21,7 +20,7 @@ public class FileLogDataAccess : IDataAccess<LogEntry>
         _logger = logger;
     }
 
-    public async Task Add(LogEntry entry)
+    public async Task<LogEntry> Add(LogEntry entry)
     {
         var fullPath = Path.GetFullPath(localFileData.Value.LogData);
         var logEntries = await GetAll();
@@ -29,6 +28,8 @@ public class FileLogDataAccess : IDataAccess<LogEntry>
         logEntries = logEntries.Select(UpdateEncryptedText).ToList();
         var json = JsonConvert.SerializeObject(logEntries);
         await File.WriteAllTextAsync(fullPath, json);
+
+        return entry;
     }
 
     public async Task<List<LogEntry>> GetAll()
@@ -76,7 +77,7 @@ public class FileLogDataAccess : IDataAccess<LogEntry>
 
     private byte[] ConvertFromBase64(string str)
         => Convert.FromBase64String(str);
-    
+
     private string ConvertToBase64(byte[] str)
         => Convert.ToBase64String(str);
 
@@ -87,7 +88,7 @@ public class FileLogDataAccess : IDataAccess<LogEntry>
     {
         return DecryptStringFromBytes(str, key);
     }
-    
+
     private byte[] ConvertToAesEncrypted(string str) // TODO
     {
         return EncryptStringToBytes(str, key);

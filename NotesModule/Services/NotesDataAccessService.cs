@@ -10,21 +10,26 @@ public partial class NotesDataAccessService
 {
     private readonly FileLogDataAccess _fileDataAccess;
     private readonly ImportFromGoogleNotesDataAccess _fileImportDataAccess;
+    private readonly DBLogDataAccess _dbDataAccess;
 
     public async Task<List<LogEntry>> GetAll()
     {
+        var dbList = await _dbDataAccess.GetAll();
+        return dbList;
+
         var fileList = await _fileDataAccess.GetAll();
         var importList = await _fileImportDataAccess.GetAll();
 
-        var mappedFileList = fileList;
         var mappedImportList = importList.Select(s => s.Map());
 
-        return mappedFileList
-            .Concat(mappedImportList).ToList();
+        return Enumerable.Empty<LogEntry>()
+                         .Concat(fileList)
+                         .Concat(mappedImportList)
+                         .ToList();
     }
 
-    public async Task Add(LogEntry logEntry)
+    public async Task<LogEntry> Add(LogEntry logEntry)
     {
-        await _fileDataAccess.Add(logEntry);
+        return await _dbDataAccess.Add(logEntry);
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace MonitorDataAccess.DataAccess;
 
-public interface IDataAccess<TDto>
+public interface IDataAccess<Entity>
 {
-    Task<List<TDto>> GetAll();
-    Task Add(TDto entry);
+    Task<List<Entity>> GetAll();
+    Task<Entity> Add(Entity entry);
 }
