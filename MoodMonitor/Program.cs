@@ -4,7 +4,6 @@ using MonitorDataAccess.Extensions;
 using MoodModule.Extensions;
 using StatsModule.Extensions;
 using NotesModule.Extensions;
-using MoodModule.Entities;
 using MatBlazor;
 using Microsoft.Extensions.Hosting;
 using System;

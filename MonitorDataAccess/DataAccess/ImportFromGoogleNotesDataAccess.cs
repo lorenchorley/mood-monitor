@@ -8,9 +8,12 @@ using System.Text.RegularExpressions;
 
 namespace MonitorDataAccess.DataAccess;
 
-public partial class ImportFromGoogleNotesDataAccess([FromKeyedServices("GoogleNotesData")] IEnumerable<ITextDataSource> dataSources) : IDataAccess<LogHistoryEntry>
+[AutoConstructor]
+public partial class ImportFromGoogleNotesDataAccess : IDataAccess<LogHistoryEntry>
 {
     private Regex _logHeaderMatch = new Regex(@"(?<Annotation>[a-zA-Z]\w*)?\s*(?<Date>\d{1,2}\/\d{1,2}\/\d{1,4})[^\n]*");
+
+    private readonly IEnumerable<ITextDataSource> _dataSources;
 
     public Task<LogHistoryEntry> Add(LogHistoryEntry entry)
     {
@@ -21,7 +24,7 @@ public partial class ImportFromGoogleNotesDataAccess([FromKeyedServices("GoogleN
     {
         List<LogHistoryEntry> list = new();
 
-        foreach (var dataSource in dataSources)
+        foreach (var dataSource in _dataSources)
         {
             var entries = await dataSource.GetText();
             list.AddRange(ParseLogEntries(entries));

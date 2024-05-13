@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 
 public class FileTextDataSource(string filePath) : ITextDataSource
 {

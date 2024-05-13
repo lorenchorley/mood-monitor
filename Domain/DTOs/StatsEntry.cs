@@ -1,4 +1,5 @@
 ﻿using Domain.Types;
+using Newtonsoft.Json;
 
 namespace Domain.DTOs;
 
@@ -9,4 +10,5 @@ public class StatsEntry
     public MoodValue? Mood { get; set; }
     public EnergyValue? EnergyLevel { get; set; }
     public DepressionValue? DepressionRating { get; set; }
+
 }

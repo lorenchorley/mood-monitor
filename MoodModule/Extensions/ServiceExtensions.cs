@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MonitorDataAccess.DataAccess;
-using MoodModule.Entities;
 using MoodModule.Services;
 
 namespace MoodModule.Extensions;

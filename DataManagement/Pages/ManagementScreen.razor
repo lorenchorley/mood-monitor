@@ -1,6 +1,12 @@
 ﻿@page "/datamanagement"
-
-@inject MonitorDataAccess.DataAccess.ImportFromMoodHistoryDataAccess importFromMoodHistoryDataAccess
+@using Domain.DTOs
+@using MonitorDataAccess.DataAccess
+@using MonitorDataAccess.EF
+@using Domain.DTOs
+@using MonitorDataAccess.DataAccess
+@using MonitorDataAccess.EF
+@using MonitorDataAccess.Extensions
+@using System.Text
 
 <h3>Data Management</h3>
 
@@ -10,38 +16,141 @@
 <p>Select database : (json local, sql, google sheet)</p>
 <p>Import MoodHistory export</p>
 
-<MatButton OnClick="@ImportData" Label="Import Data"></MatButton>
+<MatFileUpload OnChange="@MoodFilesReady" Label="Drop a single file here or Browse"></MatFileUpload>
+@foreach (var f in MoodDataFileList)
+{
+    <ul>@f</ul>
+}
+
+<MatButton OnClick="@ImportMoodData" Label="Import Mood Data"></MatButton>
+<MatButton OnClick="@ExportMoodData" Label="Export Mood Data"></MatButton>
+
 
 <h4>Log data</h4>
 
 <p>Import from google notes</p>
 
-<MatFileUpload OnChange="@FilesReady" Label="Drop a single file here or Browse"></MatFileUpload>
-@foreach (var f in list)
+<MatFileUpload OnChange="@LogFilesReady" AllowMultiple=true Label="Drop a single file here or Browse"></MatFileUpload>
+@foreach (var f in LogDataFileList)
 {
     <ul>@f</ul>
 }
 
-<MatButton OnClick="@ImportData" Label="Import Data"></MatButton>
+<MatButton OnClick="@ImportLogData" Label="Import Log Data"></MatButton>
 
+
+<h4>Output</h4>
+
+@foreach (var line in _operationLog)
+{
+    <p>@line</p>
+}
 
 
 @code {
-    private async Task ImportData()
+
+    [Inject]
+    private IJSRuntime _jsRuntime { get; set; } = null!;
+    
+    [Inject]
+    private DBStatsDataAccess _dbStatsDataAccess { get; set; } = null!;
+    
+    [Inject]
+    private DBLogDataAccess _dbLogDataAccess { get; set; } = null!;
+
+    private IMatFileUploadEntry[] MoodDataFileList { get; set; } = Array.Empty<IMatFileUploadEntry>();
+    private IMatFileUploadEntry[] LogDataFileList { get; set; } = Array.Empty<IMatFileUploadEntry>();
+
+    private List<string> _operationLog = new();
+
+    private async Task ExportMoodData()
     {
-        // TODO
-        importFromMoodHistoryDataAccess.GetAll();
+        var content = _dbStatsDataAccess.GetAll();
+
+
+        await _jsRuntime.InvokeAsync<object>("saveFile", ["export.json", content]);
     }
 
-
-
-    List<string> list = new List<string>();
-
-    void FilesReady(IMatFileUploadEntry[] files)
+    private async Task ImportMoodData()
     {
-        foreach (var file in files)
+        List<(IMatFileUploadEntry, string)> uploadEntries = await SaveToString(MoodDataFileList);
+
+        List<StatsEntry> globalListToAdd = new();
+
+        foreach (var uploadEntry in uploadEntries)
         {
-            list.Add($"Name: {file.Name} - Size: {file.Size}");
+            ImportFromMoodHistoryDataAccess importer = new([new InMemoryTextDataSource(uploadEntry.Item2)]);
+            var list = await importer.GetAll();
+            List<StatsEntry> mappedList = list.Select(s => s.Map())
+                                 .ToList();
+
+            globalListToAdd.AddRange(mappedList);
+
+            _operationLog.Add($"Importing {mappedList.Count} mood entries from uploaded file : {uploadEntry.Item1.Name}");
         }
+
+        await _dbStatsDataAccess.AddRange(globalListToAdd);
+        _operationLog.Add($"Imported {globalListToAdd.Count} mood entries.");
+
+        MoodDataFileList = Array.Empty<IMatFileUploadEntry>();
+    }
+
+    void MoodFilesReady(IMatFileUploadEntry[] files)
+    {
+        MoodDataFileList = files;
+    }
+
+    private async Task ImportLogData()
+    {
+        List<(IMatFileUploadEntry, string)> uploadEntries = await SaveToString(LogDataFileList);
+
+        List<LogEntry> globalListToAdd = new();
+
+        foreach (var uploadEntry in uploadEntries)
+        {
+            ImportFromGoogleNotesDataAccess importer = new([new InMemoryTextDataSource(uploadEntry.Item2)]);
+            var list = await importer.GetAll();
+            var mappedList = list.Select(s => s.Map())
+                                 .ToList();
+
+            foreach (LogEntry entry in mappedList)
+            {
+                entry.UpdateEncryptedText();
+            }
+
+            globalListToAdd.AddRange(mappedList);
+
+            _operationLog.Add($"Importing {mappedList.Count} log entries from uploaded file : {uploadEntry.Item1.Name}");
+        }
+
+        await _dbLogDataAccess.AddRange(globalListToAdd);
+        _operationLog.Add($"Imported {globalListToAdd.Count} log entries.");
+
+        LogDataFileList = Array.Empty<IMatFileUploadEntry>();
+    }
+
+    void LogFilesReady(IMatFileUploadEntry[] files)
+    {
+        LogDataFileList = files;
+    }
+
+    private static async Task<List<(IMatFileUploadEntry, string)>> SaveToString(IMatFileUploadEntry[] fileUploads)
+    {
+        List<(IMatFileUploadEntry, string)> list = new();
+
+        foreach (var upload in fileUploads)
+        {
+            var stringContent = await SaveToString(upload);
+            list.Add((upload, stringContent));
+        }
+
+        return list;
+    }
+
+    private static async Task<string> SaveToString(IMatFileUploadEntry fileUpload)
+    {
+        using MemoryStream stream = new();
+        await fileUpload.WriteToStreamAsync(stream);
+        return Encoding.UTF8.GetString(stream.ToArray());
     }
 }

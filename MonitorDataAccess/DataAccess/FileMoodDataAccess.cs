@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using MonitorDataAccess.Config;
 using Domain.DTOs;
 using Newtonsoft.Json;
+using static MonitorDataAccess.Extensions.MoodEntryExtensions;
 
 namespace MonitorDataAccess.DataAccess;
 
@@ -21,9 +22,11 @@ public class FileMoodDataAccess : IDataAccess<StatsEntry>
     public async Task<StatsEntry> Add(StatsEntry entry)
     {
         var fullPath = Path.GetFullPath(localFileData.Value.MoodData);
+
         var moodEntries = await GetAll();
         moodEntries.Add(entry);
-        var json = JsonConvert.SerializeObject(moodEntries);
+
+        var json = moodEntries.SerialiseToList();
         await File.WriteAllTextAsync(fullPath, json);
 
         return entry;
@@ -36,22 +39,12 @@ public class FileMoodDataAccess : IDataAccess<StatsEntry>
         if (!File.Exists(fullPath))
         {
             _logger.LogWarning("Local mood data file not present : {path}", fullPath);
-            var list = new List<StatsEntry>()
-            {
-                new StatsEntry()
-                {
-                    Creation = DateTime.Now,
-                }
-            };
-
-            var json = JsonConvert.SerializeObject(list);
-            File.WriteAllText(fullPath, json);
+            File.WriteAllText(fullPath, JsonConvert.SerializeObject(new List<StatsEntry>()));
         }
 
-        var text = File.ReadAllText(fullPath);
-        return await Task.FromResult(JsonConvert.DeserializeObject<List<StatsEntry>>(text));
+        var json = File.ReadAllText(fullPath);
+        return await Task.FromResult(json.DeserialiseToList());
 
     }
-
 
 }

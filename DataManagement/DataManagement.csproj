@@ -16,10 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Data\Moodistory 20240129 132739.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoConstructor" Version="5.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -34,6 +30,7 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>

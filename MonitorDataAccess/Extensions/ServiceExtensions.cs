@@ -18,23 +18,23 @@ public static class ServiceExtensions
 
         services.AddSingleton<ImportFromGoogleNotesDataAccess>();
 
-        string dataDirectory = @"C:\Users\lchorley\source\repos\mood-monitor\DataManagement\Data\";
-        string[] googleNotesFiles =
-        [
-            "GoogleNotes 21.10.31.txt",
-            "GoogleNotes 22.10.31.txt",
-            "GoogleNotes 23.07.26.txt",
-            "GoogleNotes 23.11.05.txt",
-            "GoogleNotes 24.03.17.txt",
-        ];
+        //string dataDirectory = @"C:\Users\lchorley\source\repos\mood-monitor\DataManagement\Data\";
+        //string[] googleNotesFiles =
+        //[
+        //    "GoogleNotes 21.10.31.txt",
+        //    "GoogleNotes 22.10.31.txt",
+        //    "GoogleNotes 23.07.26.txt",
+        //    "GoogleNotes 23.11.05.txt",
+        //    "GoogleNotes 24.03.17.txt",
+        //];
 
-        foreach (var file in googleNotesFiles)
-        {
-            services.AddKeyedSingleton<ITextDataSource, FileTextDataSource>($"GoogleNotesData", (sp, o) => new FileTextDataSource(Path.Combine(dataDirectory, file)));
-        }
+        //foreach (var file in googleNotesFiles)
+        //{
+        //    services.AddKeyedSingleton<ITextDataSource, FileTextDataSource>($"GoogleNotesData", (sp, o) => new FileTextDataSource(Path.Combine(dataDirectory, file)));
+        //}
 
-        string moodHistoryFilename = "Moodistory 20240129 132739.json";
-        services.AddKeyedSingleton<ITextDataSource, FileTextDataSource>($"MoodHistoryData", (sp, o) => new FileTextDataSource(Path.Combine(dataDirectory, moodHistoryFilename)));
+        //string moodHistoryFilename = "Moodistory 20240129 132739.json";
+        //services.AddKeyedSingleton<ITextDataSource, FileTextDataSource>($"MoodHistoryData", (sp, o) => new FileTextDataSource(Path.Combine(dataDirectory, moodHistoryFilename)));
     }
 
     public static void ConfigureDataAccessServices(this IServiceCollection services, IConfiguration configuration)

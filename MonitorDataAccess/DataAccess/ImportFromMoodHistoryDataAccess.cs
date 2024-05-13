@@ -2,11 +2,14 @@
 using MonitorDataAccess.DataAccess;
 using MonitorDataAccess.ExampleData;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace MonitorDataAccess.DataAccess;
 
-public partial class ImportFromMoodHistoryDataAccess([FromKeyedServices("MoodHistoryData")] ITextDataSource dataSource) : IDataAccess<MoodHistoryEntry>
+[AutoConstructor]
+public partial class ImportFromMoodHistoryDataAccess : IDataAccess<MoodHistoryEntry>
 {
+    private readonly ITextDataSource[] _dataSources;
 
     public Task<MoodHistoryEntry> Add(MoodHistoryEntry entry)
     {
@@ -15,8 +18,15 @@ public partial class ImportFromMoodHistoryDataAccess([FromKeyedServices("MoodHis
 
     public async Task<List<MoodHistoryEntry>> GetAll()
     {
-        string json = await dataSource.GetText();
-        List<MoodHistoryEntry> rootObjects = JsonConvert.DeserializeObject<List<MoodHistoryEntry>>(json);
-        return rootObjects;
+        List<MoodHistoryEntry> list = new();
+
+        foreach (var dataSource in _dataSources)
+        {
+            string json = await dataSource.GetText();
+            List<MoodHistoryEntry> rootObjects = JsonConvert.DeserializeObject<List<MoodHistoryEntry>>(json);
+            list.AddRange(rootObjects);
+        }
+
+        return list;
     }
 }
